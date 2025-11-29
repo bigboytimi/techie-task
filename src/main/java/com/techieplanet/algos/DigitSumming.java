@@ -1,4 +1,4 @@
-package com.techieplanet;
+package com.techieplanet.algos;
 
 /**
  * @author timiolowookere
