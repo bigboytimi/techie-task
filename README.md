@@ -1,5 +1,5 @@
 
-# Student Management and Algorithms App
+# Student Management App and Algorithms
 
 This project contains a **Student Management System** with services for creating, updating, and reporting student data, as well as a collection of **algorithm utilities** including numeral-to-words conversion, digit summing, and duplicate removal.
 
@@ -100,8 +100,8 @@ This project contains a **Student Management System** with services for creating
 1. Clone the repository:
 
 ```bash
-git clone <repository-url>
-cd studentapp
+git clone https://github.com/bigboytimi/techie-task.git
+cd techie-task
 ````
 
 2. Build the project using Maven:
