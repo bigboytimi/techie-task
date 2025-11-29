@@ -59,7 +59,6 @@ public class StudentService {
         Page<Student> studentPage;
         if (StringUtils.isEmpty(normalizedName)) {
             studentPage = studentRepository.findAll(pageable);
-
         } else {
             studentPage = studentRepository.findByNameContainingIgnoreCase(normalizedName, pageable);
         }
@@ -93,7 +92,6 @@ public class StudentService {
         subjects.put("Physics", s.getPhysics());
         subjects.put("Computer Science", s.getComputerScience());
 
-        // Extract numeric values for stats
         List<Integer> scores = new ArrayList<>(subjects.values());
 
         StudentResponse studentResponse = new StudentResponse();
