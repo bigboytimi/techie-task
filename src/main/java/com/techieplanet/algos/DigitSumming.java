@@ -19,6 +19,6 @@ public class DigitSumming {
     public static void main(String[] args) {
         String input = "1234445";
         int root = digitalRoot(input);
-        System.out.println(root); // Output: 5
+        System.out.println(root);
     }
 }
