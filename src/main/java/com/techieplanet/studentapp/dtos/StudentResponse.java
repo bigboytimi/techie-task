@@ -12,7 +12,7 @@ import java.util.List;
 public class StudentResponse {
     public Long id;
     public String name;
-    public List<Integer> scores; // 5 subjects
+    public List<Integer> scores;
     public double mean;
     public double median;
     public Integer mode;

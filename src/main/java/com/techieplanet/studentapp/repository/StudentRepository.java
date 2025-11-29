@@ -16,4 +16,7 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     @Query("SELECT s FROM Student s WHERE (:name IS NULL OR lower(s.name) LIKE lower(concat('%',:name,'%'))) ")
     Page<Student> findByNameContainingIgnoreCase(@Param("name") String name, Pageable pageable);
+
+    boolean existsByStudentIdNo(String studentIdNo);
+
 }

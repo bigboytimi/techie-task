@@ -24,7 +24,12 @@ public class Student {
 
 
     @NotBlank
+    @Column(name = "student_name", nullable = false, length = 100)
     private String name;
+
+    @NotBlank
+    @Column(name = "student_id_no", nullable = false, length = 100)
+    private String studentIdNo;
 
 
     @Min(0) @Max(100)

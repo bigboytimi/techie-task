@@ -1,7 +1,7 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/techieplanet
-    username: postgres
+    username: timiolowookere
     password: yourpassword
     driver-class-name: org.postgresql.Driver
 

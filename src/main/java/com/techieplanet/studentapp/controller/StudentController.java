@@ -5,6 +5,7 @@ import com.techieplanet.studentapp.dtos.CreateStudentRequest;
 import com.techieplanet.studentapp.dtos.StudentResponse;
 import com.techieplanet.studentapp.model.Student;
 import com.techieplanet.studentapp.service.StudentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,7 +26,7 @@ public class StudentController {
     private final StudentService service;
 
     @PostMapping
-    public ResponseEntity<StudentResponse> create(@RequestBody CreateStudentRequest request) {
+    public ResponseEntity<StudentResponse> create(@RequestBody @Valid CreateStudentRequest request) {
         StudentResponse created = service.create(request);
         return ResponseEntity.ok(created);
     }
@@ -33,7 +34,7 @@ public class StudentController {
     @PutMapping("/{id}")
     public ResponseEntity<StudentResponse> update(
             @PathVariable Long id,
-            @RequestBody CreateStudentRequest request) {
+            @RequestBody @Valid  CreateStudentRequest request) {
 
         Student updated = service.update(id, request);
         return ResponseEntity.ok(service.toResponse(updated));

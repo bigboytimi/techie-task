@@ -32,11 +32,15 @@ public class StudentService {
     public StudentResponse create(CreateStudentRequest req) {
         if (req == null) throw new BadRequestException("Request must not be null");
 
+        if(studentRepository.existsByStudentIdNo(req.getStudentIdNo())) {
+            throw new BadRequestException("Student with id " + req.getStudentIdNo() + " already exists");
+        }
+
         Student student = new Student();
         student.setComputerScience(req.getComputerScience());
         student.setName(req.getName());
         student.setBiology(req.getBiology());
-
+        student.setStudentIdNo(req.getStudentIdNo());
         student.setMathematics(req.getMathematics());
         student.setChemistry(req.getChemistry());
         student.setPhysics(req.getPhysics());
@@ -125,6 +129,7 @@ public class StudentService {
         student.setChemistry(request.getChemistry());
         student.setPhysics(request.getPhysics());
         student.setComputerScience(request.getComputerScience());
+        student.setStudentIdNo(request.getStudentIdNo());
         return student;
     }
 }
