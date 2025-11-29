@@ -5,16 +5,20 @@ package com.techieplanet.algos;
  * @since 29-11-2025
  */
 public class DigitSumming {
-    // Part A logic reused
     public static int sumDigits(String s) {
-        if (s.length() == 0) return 0;
+        if (s.isEmpty()) return 0;
         return (s.charAt(0) - '0') + sumDigits(s.substring(1));
     }
 
-    // Part B - Recursive digital root
     public static int digitalRoot(String s) {
         int sum = sumDigits(s);
         if (sum < 10) return sum;
         return digitalRoot(String.valueOf(sum));
+    }
+
+    public static void main(String[] args) {
+        String input = "1234445";
+        int root = digitalRoot(input);
+        System.out.println(root); // Output: 5
     }
 }

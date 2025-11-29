@@ -9,7 +9,6 @@ public class DuplicateRemover {
 
         for (int i = 0; i < arr.length; i++) {
 
-            // Find maximum value in row to size visited array efficiently
             int maxVal = 0;
             for (int j = 0; j < arr[i].length; j++) {
                 if (arr[i][j] > maxVal) {
@@ -22,13 +21,30 @@ public class DuplicateRemover {
             for (int j = 0; j < arr[i].length; j++) {
                 int val = arr[i][j];
                 if (visited[val] == 0) {
-                    visited[val] = 1; // first appearance
+                    visited[val] = 1;
                 } else {
-                    arr[i][j] = 0; // duplicate → replace with 0
+                    arr[i][j] = 0;
                 }
             }
         }
 
         return arr;
+    }
+
+    public static void main(String[] args) {
+        int[][] input = {
+                {1, 3, 1, 2, 3, 4, 4, 3, 5},
+                {1, 1, 1, 1, 1, 1, 1}
+        };
+
+        int[][] output = removeDuplicates(input);
+
+        for (int[] row : output) {
+            System.out.print("{");
+            for (int v : row) {
+                System.out.print(v + " ");
+            }
+            System.out.println("}");
+        }
     }
 }

@@ -1,5 +1,7 @@
 package com.techieplanet.algos;
 
+import java.util.Scanner;
+
 /**
  * @author timiolowookere
  * @since 28-11-2025
@@ -48,4 +50,12 @@ public class ConvertNumeralsToWords {
     private static String capitalize(String str) {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int H = sc.nextInt();
+        int M = sc.nextInt();
+        System.out.println(timeInWords(H, M));
+    }
+
 }
