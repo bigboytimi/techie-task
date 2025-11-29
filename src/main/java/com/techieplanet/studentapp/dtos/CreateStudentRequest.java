@@ -14,8 +14,6 @@ import lombok.Data;
 public class CreateStudentRequest {
     @NotBlank
     public String name;
-    @NotBlank
-    public String studentIdNo;
     @NotNull
     @Min(0) @Max(100)
     public Integer mathematics;

@@ -2,7 +2,7 @@ package com.techieplanet.studentapp.dtos;
 
 import lombok.Data;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author timiolowookere
@@ -10,9 +10,9 @@ import java.util.List;
  */
 @Data
 public class StudentResponse {
-    public Long id;
     public String name;
-    public List<Integer> scores;
+    public String studentIdNo;
+    public Map<String, Integer> subjects;
     public double mean;
     public double median;
     public Integer mode;

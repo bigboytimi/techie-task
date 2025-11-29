@@ -2,6 +2,7 @@ package com.techieplanet.studentapp.controller;
 
 import com.techieplanet.studentapp.common.Constants;
 import com.techieplanet.studentapp.dtos.CreateStudentRequest;
+import com.techieplanet.studentapp.dtos.ReportResponse;
 import com.techieplanet.studentapp.dtos.StudentResponse;
 import com.techieplanet.studentapp.model.Student;
 import com.techieplanet.studentapp.service.StudentService;
@@ -31,25 +32,25 @@ public class StudentController {
         return ResponseEntity.ok(created);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{studentId}")
     public ResponseEntity<StudentResponse> update(
-            @PathVariable Long id,
+            @PathVariable String studentId,
             @RequestBody @Valid  CreateStudentRequest request) {
 
-        Student updated = service.update(id, request);
+        Student updated = service.update(studentId, request);
         return ResponseEntity.ok(service.toResponse(updated));
     }
 
     @GetMapping
-    public ResponseEntity<Page<StudentResponse>> report(
-            @RequestParam String name,
+    public ResponseEntity<ReportResponse> report(
+            @RequestParam(required = false) String name,
             @RequestParam(required = false) Double minMean,
             @RequestParam(required = false) Double maxMean,
             @RequestParam(required = false, defaultValue = "0") int pageNo,
             @RequestParam(required = false, defaultValue = "10") int pageSize) {
 
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-        Page<StudentResponse> result = service.report(name, minMean, maxMean, pageable);
+        ReportResponse result = service.report(name, minMean, maxMean, pageable);
         return ResponseEntity.ok(result);
     }
 }

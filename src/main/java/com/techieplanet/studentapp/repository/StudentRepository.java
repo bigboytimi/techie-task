@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 /**
  * @author timiolowookere
  * @since 29-11-2025
@@ -19,4 +21,5 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     boolean existsByStudentIdNo(String studentIdNo);
 
+    Optional<Student> findByStudentIdNo(String studentIdNo);
 }

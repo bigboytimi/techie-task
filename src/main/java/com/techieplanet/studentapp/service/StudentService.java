@@ -1,6 +1,7 @@
 package com.techieplanet.studentapp.service;
 
 import com.techieplanet.studentapp.dtos.CreateStudentRequest;
+import com.techieplanet.studentapp.dtos.ReportResponse;
 import com.techieplanet.studentapp.dtos.StudentResponse;
 import com.techieplanet.studentapp.error.BadRequestException;
 import com.techieplanet.studentapp.error.NotFoundException;
@@ -8,15 +9,14 @@ import com.techieplanet.studentapp.model.Student;
 import com.techieplanet.studentapp.repository.StudentRepository;
 import com.techieplanet.studentapp.util.CalculatorUtil;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -32,15 +32,17 @@ public class StudentService {
     public StudentResponse create(CreateStudentRequest req) {
         if (req == null) throw new BadRequestException("Request must not be null");
 
-        if(studentRepository.existsByStudentIdNo(req.getStudentIdNo())) {
-            throw new BadRequestException("Student with id " + req.getStudentIdNo() + " already exists");
+        String studentId = generateStudentId(req.getName());
+
+        if (studentRepository.existsByStudentIdNo(studentId)) {
+            throw new BadRequestException("Student with id " + studentId + " already exists");
         }
 
         Student student = new Student();
         student.setComputerScience(req.getComputerScience());
         student.setName(req.getName());
         student.setBiology(req.getBiology());
-        student.setStudentIdNo(req.getStudentIdNo());
+        student.setStudentIdNo(studentId);
         student.setMathematics(req.getMathematics());
         student.setChemistry(req.getChemistry());
         student.setPhysics(req.getPhysics());
@@ -50,78 +52,67 @@ public class StudentService {
     }
 
     @Transactional(readOnly = true)
-    public Page<StudentResponse> report(String nameFilter, Double minMean, Double maxMean, Pageable pageable) {
+    public ReportResponse report(String nameFilter, Double minMean, Double maxMean, Pageable pageable) {
+
         String normalizedName = (nameFilter == null || nameFilter.trim().isEmpty()) ? null : nameFilter.trim();
 
-        Page<Student> studentPage = studentRepository.findByNameContainingIgnoreCase(normalizedName, pageable);
-        List<Student> students = studentPage.getContent();
+        Page<Student> studentPage;
+        if (StringUtils.isEmpty(normalizedName)) {
+            studentPage = studentRepository.findAll(pageable);
 
-        List<StudentResponse> allResponses = students.stream()
+        } else {
+            studentPage = studentRepository.findByNameContainingIgnoreCase(normalizedName, pageable);
+        }
+
+        List<StudentResponse> filtered = studentPage.getContent().stream()
                 .map(this::toResponse)
+                .filter(r ->
+                        (minMean == null || r.mean >= minMean) &&
+                                (maxMean == null || r.mean <= maxMean)
+                )
                 .toList();
 
-        List<StudentResponse> filtered = allResponses.stream()
-                .filter(r -> {
-                    boolean okMin = (minMean == null) || (r.mean >= minMean);
-                    boolean okMax = (maxMean == null) || (r.mean <= maxMean);
-                    return okMin && okMax;
-                })
-                .collect(Collectors.toList());
-
-        long total = filtered.size();
-
-
-        if (pageable == null || pageable.isUnpaged()) {
-            return new PageImpl<>(filtered, pageable == null ? Pageable.unpaged() : pageable, total);
-        }
-
-        int pageNumber = pageable.getPageNumber();
-        int pageSize = pageable.getPageSize();
-        int fromIndex = pageNumber * pageSize;
-        int toIndex = Math.min(fromIndex + pageSize, filtered.size());
-
-        List<StudentResponse> pageContent;
-        if (fromIndex >= filtered.size()) {
-            pageContent = Collections.emptyList();
-        } else {
-            pageContent = filtered.subList(fromIndex, toIndex);
-        }
-
-        return new PageImpl<>(pageContent, pageable, total);
+        return new ReportResponse(
+                studentPage.getTotalPages(),
+                studentPage.getTotalElements(),
+                studentPage.isFirst(),
+                studentPage.isLast(),
+                studentPage.getSize(),
+                filtered
+        );
     }
 
-    @Transactional(readOnly = true)
-    public StudentResponse getById(Long id) {
-        Student s = studentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Student not found with id: " + id));
-        return toResponse(s);
-    }
 
     public StudentResponse toResponse(Student s) {
         if (s == null) return null;
-        List<Integer> scores = Arrays.asList(
-                s.getBiology(),
-                s.getChemistry(),
-                s.getMathematics(),
-                s.getPhysics(),
-                s.getComputerScience()
-        );
+
+        Map<String, Integer> subjects = new LinkedHashMap<>();
+        subjects.put("Biology", s.getBiology());
+        subjects.put("Chemistry", s.getChemistry());
+        subjects.put("Mathematics", s.getMathematics());
+        subjects.put("Physics", s.getPhysics());
+        subjects.put("Computer Science", s.getComputerScience());
+
+        // Extract numeric values for stats
+        List<Integer> scores = new ArrayList<>(subjects.values());
 
         StudentResponse studentResponse = new StudentResponse();
-        studentResponse.id = s.getId();
+        studentResponse.studentIdNo = s.getStudentIdNo();
         studentResponse.name = s.getName();
-        studentResponse.scores = scores;
+        studentResponse.subjects = subjects;
         studentResponse.mean = CalculatorUtil.calculateMean(scores);
         studentResponse.median = CalculatorUtil.calculateMedian(scores);
         studentResponse.mode = CalculatorUtil.calculateMode(scores);
+
         return studentResponse;
     }
 
-    public Student update(Long id, CreateStudentRequest request) {
+
+    public Student update(String studentIdNo, CreateStudentRequest request) {
         if (request == null) throw new BadRequestException("Request must not be null");
 
-        Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Student not found with id: " + id));
+        Student student = studentRepository.findByStudentIdNo(studentIdNo)
+                .orElseThrow(() -> new NotFoundException("Student not found with id: " + studentIdNo));
 
         student.setName(request.getName());
         student.setBiology(request.getBiology());
@@ -129,7 +120,14 @@ public class StudentService {
         student.setChemistry(request.getChemistry());
         student.setPhysics(request.getPhysics());
         student.setComputerScience(request.getComputerScience());
-        student.setStudentIdNo(request.getStudentIdNo());
         return student;
     }
+
+    public String generateStudentId(String name) {
+        String cleanName = name.replaceAll("\\s+", "").toUpperCase();
+        Random random = new Random();
+        int randomSixDigits = 100000 + random.nextInt(900000);
+        return cleanName + randomSixDigits;
+    }
+
 }
